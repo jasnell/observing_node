@@ -96,6 +96,17 @@
         </p>
       </section>
 
+      <section>
+        <section>
+          <img src="media/didyouknow.jpg"/>
+          <h2>We recently landed worker-threads in Node.js 10.5</h2>
+        </section>
+        <section>
+            <img src="media/didyouknow.jpg"/>
+            <h2>But Node.js has always been multi-threaded.</h2>
+        </section>
+      </section>
+
       <section data-background="media/monitoring.jpg"
                style="color: black; text-align: left;">
         <h2 style="color: black">Monitoring</h2>
@@ -150,11 +161,11 @@
   const async_hooks = require('async_hooks');
 
   const asyncHook = async_hooks.createHook({
-    init(asyncId, type, triggerAsyncId, resource) { },
-    before(asyncId) { },
-    after(asyncId) { },
-    destroy(asyncId) { },
-    promiseResolve(asyncId) { }
+    init(id, type, triggerAsyncId, resource) { },
+    before(id) { },
+    after(id) { },
+    destroy(id) { },
+    promiseResolve(id) { }
   });
 
   asyncHook.enable();
@@ -262,6 +273,17 @@ doSomeLongRunningProcess(() => {
         </section>
       </section>
 
+      <section>
+          <section>
+            <img src="media/didyouknow.jpg"/>
+            <h2>Does all Node.js code run within the event loop?</h2>
+          </section>
+          <section>
+              <img src="media/didyouknow.jpg"/>
+              <h2>The "main" entry point runs before the loop</h2>
+            </section>
+        </section>
+
       <section data-background="media/monitoring.jpg"
                style="color: black; text-align: left;">
         <section>
@@ -365,6 +387,13 @@ $ clinic doctor -- node some.application.js
           </p>
         </section>
       </section>
+
+      <section>
+          <section>
+            <img src="media/didyouknow.jpg"/>
+            <h2>Promises, nextTick and Immediates are weird</h2>
+          </section>
+        </section>
 
       <section data-background="media/tracing.jpg"
                style="color: black; text-align: left;">
