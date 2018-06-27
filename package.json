@@ -1,0 +1,7 @@
+{
+  "name": "nodejs-what-next-presentation",
+  "private": true,
+  "dependencies": {
+    "pino": "^4.8.1"
+  }
+}

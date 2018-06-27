@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <title>Observing Node.js</title>
+
+  <meta name="description" content="Observing Node.js">
+  <meta name="author" content="James M Snell">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <link rel="stylesheet" href="css/reveal.css">
+  <link rel="stylesheet" href="css/theme/black.css" id="theme">
+
+  <!-- Theme used for syntax highlighting of code -->
+  <link rel="stylesheet" href="lib/css/zenburn.css">
+
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+
+  <!--[if lt IE 9]>
+  <script src="lib/js/html5shiv.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+  <img src="media/nearform.png" width="150"/>
+  <div class="reveal">
+    <div class="slides">
+
+      <section style="text-align: left;">
+        <h1>Observing Node.js</h1>
+        <h3>Efforts to improve the observability of Node.js</h3>
+        <p>
+          <small><a href="https://github.com/jasnell">James M Snell</a> / <a href="http://twitter.com/jasnell">@jasnell</a></small>
+        </p>
+      </section>
+
+      <section data-background="media/blackbox.jpg"></section>
+
+      <section data-background="media/blackbox.jpg">
+        <h2>What's happening inside?</h2>
+      </section>
+
+      <section data-background="media/monitoring.jpg"
+               style="color: black; text-align: left;">
+        <h2 style="color: black">Monitoring</h2>
+        <p>
+          to watch, keep track of, or check<br />
+          usually for a special purpose.
+        </p>
+        <p>
+          to watch, observe, or check closely<br />
+          or continuously.
+        </p>
+        <p><small>Source: Merriam-Webster</small></p>
+      </section>
+
+      <section data-background="media/profiling.jpg"
+               style="color: black; text-align: right;">
+        <h2 style="color: black">Profiling</h2>
+        <p>
+          a set of data often in graphic form<br />
+          portraying the significant features<br/>
+          of something.
+        </p>
+        <p>
+          to give a brief description that provides<br />
+          information about [something].
+        </p>
+        <p><small>Source: Merriam-Webster</small></p>
+      </section>
+
+      <section data-background="media/tracing.jpg"
+               style="color: black; text-align: left;">
+        <h2 style="color: black">Tracing</h2>
+        <p>
+          a mark left by something that has passed or is past.
+        </p>
+        <p>
+          to follow the footprints of, track, or trail of.
+        </p>
+        <p>
+          <small>Source: Merriam-Webster</small>
+        </p>
+      </section>
+
+      <section data-background="media/monitoring.jpg"
+               style="color: black; text-align: left;">
+        <h2 style="color: black">Monitoring</h2>
+        <p>
+          Monitoring Node.js applications is <br />
+          the domain of APM solutions.
+        </p>
+        <ul>
+          <li>Security</li>
+          <li>Performance</li>
+          <li>Health</li>
+          <li>Service Level</li>
+        </ul>
+      </section>
+
+      <section data-background="media/monitoring.jpg"
+               style="color: black; text-align: left;">
+        <h2 style="color: black">Monitoring</h2>
+        <p>
+          Monitoring solutions such as:
+        </p>
+        <ul>
+          <li><svg xmlns="http://www.w3.org/2000/svg" width="95" height="20"><path fill="#fff" d="M95 19.977h-4.538c-4.26 0-7.704-3.454-7.704-7.725 0-4.27 3.445-7.725 7.704-7.725H95v2.638h-4.538c-2.816 0-5.074 2.287-5.074 5.087a5.077 5.077 0 0 0 5.074 5.088H95v2.637zM73.659 7.165h-6.005a1.88 1.88 0 0 0-1.885 1.89c0 1.05.838 1.89 1.885 1.89h2.84c1.605 0 3.095.864 3.91 2.264a4.5 4.5 0 0 1 0 4.527A4.532 4.532 0 0 1 70.493 20h-6.47v-2.637h6.47a1.88 1.88 0 0 0 1.885-1.89 1.88 1.88 0 0 0-1.885-1.89h-2.84c-2.49 0-4.515-2.031-4.515-4.528 0-2.497 2.025-4.528 4.515-4.528h6.005v2.638zm-13.15 12.812h-2.583v-8.868A3.959 3.959 0 0 0 53.97 7.14a3.959 3.959 0 0 0-3.957 3.968v8.868h-2.63v-8.868c0-3.641 2.933-6.582 6.564-6.582 3.63 0 6.563 2.94 6.563 6.582v8.868zM41.869 0h2.63v2.637h-2.63V0zm0 4.527h2.63v15.45h-2.63V4.527zM25.368.513v4.528h2.63v2.614h-2.63v12.322h-2.63V7.655H20.13V5.04h2.607V.513h2.63zM0 4.527h2.63v15.45H0V4.527zM0 0h2.63v2.637H0V0zm19.27 19.977h-2.583v-8.868A3.959 3.959 0 0 0 12.73 7.14a3.959 3.959 0 0 0-3.956 3.968v8.868h-2.63v-8.868c0-3.641 2.932-6.582 6.563-6.582 3.63 0 6.563 2.94 6.563 6.582v8.868zM77.499 0h2.63v2.637h-2.63V0zm0 4.527h2.63v15.45h-2.63V4.527zm-39.61 2.638a3.959 3.959 0 0 0-3.957 3.967V20h-2.63V4.551h2.63v1.33a6.467 6.467 0 0 1 3.956-1.33h1.35v2.637h-1.35v-.023z"/></svg></li>
+          <li><svg height="29px" id="CMYK_-_logo" data-name="CMYK - logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 737.94 132.03"><defs><style>.cls-1{fill:#008c99;}.cls-2{fill:#70ccd3;}</style></defs><title>NewRelic-logo-bug</title><g id="outlines"><path d="M264.86,111.25,244.67,68.93c-4.82-10-9.77-21.36-11.46-26.7l-.39.39c.65,7.55.78,17.06.91,25l.52,43.63H219.54V21.13h16.93l21.88,44a164.12,164.12,0,0,1,9.25,23.18l.39-.39c-.39-4.56-1.3-17.45-1.3-25.66l-.26-41.15h14.2v90.12Z" transform="translate(-6.9 -7.27)"/><path d="M307.44,82.21v1c0,9.12,3.39,18.75,16.28,18.75,6.12,0,11.46-2.21,16.41-6.51l5.6,8.73a35.6,35.6,0,0,1-23.7,8.73c-18.62,0-30.34-13.41-30.34-34.51,0-11.59,2.47-19.28,8.21-25.79,5.34-6.12,11.85-8.86,20.19-8.86a25.45,25.45,0,0,1,18.1,6.77c5.73,5.21,8.6,13.28,8.6,28.65v3ZM320.07,54.6c-8.07,0-12.5,6.38-12.5,17.06h24.35C331.92,61,327.24,54.6,320.07,54.6Z" transform="translate(-6.9 -7.27)"/><path d="M423,111.51H409.54l-8.07-30.34c-2.08-7.81-4.3-18-4.3-18h-.26s-1,6.51-4.3,18.62l-7.94,29.69H371.25l-18-65.25,14.2-2,7.16,31.91c1.82,8.2,3.39,17.32,3.39,17.32h.39a178.91,178.91,0,0,1,3.78-17.71l8.47-30.47h14.07L412.14,75c2.74,10.68,4.17,18.75,4.17,18.75h.39s1.56-10,3.26-17.71l6.77-30.74h14.85Z" transform="translate(-6.9 -7.27)"/><path d="M525.05,111.25l-7.81-13.94C511,86.25,506.82,80,501.87,75A7.64,7.64,0,0,0,496,72.31v38.94H481.29V21.13h27.48c20.19,0,29.3,11.72,29.3,25.79,0,12.89-8.33,24.75-22.4,24.75,3.26,1.69,9.25,10.42,13.93,18l13.28,21.62Zm-20.84-78H496V61.77h7.68c7.81,0,12-1,14.72-3.78,2.47-2.47,4-6.25,4-10.94C522.45,37.93,517.5,33.24,504.21,33.24Z" transform="translate(-6.9 -7.27)"/><path d="M562.55,82.21v1c0,9.12,3.39,18.75,16.28,18.75,6.12,0,11.46-2.21,16.41-6.51l5.6,8.73a35.6,35.6,0,0,1-23.7,8.73c-18.62,0-30.34-13.41-30.34-34.51,0-11.59,2.47-19.28,8.21-25.79,5.34-6.12,11.85-8.86,20.19-8.86a25.45,25.45,0,0,1,18.1,6.77c5.73,5.21,8.6,13.28,8.6,28.65v3ZM575.19,54.6c-8.07,0-12.5,6.38-12.5,17.06H587C587,61,582.35,54.6,575.19,54.6Z" transform="translate(-6.9 -7.27)"/><path d="M628.71,112.69c-14.46,0-14.46-13-14.46-18.62V37.93A106.73,106.73,0,0,0,613,18.66l14.72-3.26c1,4,1.17,9.51,1.17,18.1V89.37c0,8.86.39,10.29,1.43,11.85a4,4,0,0,0,4.69,1l2.34,8.86A22.44,22.44,0,0,1,628.71,112.69Z" transform="translate(-6.9 -7.27)"/><path d="M653.58,35.59a9.34,9.34,0,0,1-9.25-9.51,9.44,9.44,0,1,1,9.25,9.51Zm-7.16,75.67V46.4l14.46-2.61v67.46Z" transform="translate(-6.9 -7.27)"/><path d="M701.9,112.95c-18,0-28-12.63-28-33.86,0-24,14.33-35.42,29-35.42,7.16,0,12.37,1.69,18.23,7.16L714,60.33c-3.91-3.52-7.29-5.08-11.07-5.08a11.2,11.2,0,0,0-10.42,6.64c-2,4-2.73,10.16-2.73,18.36,0,9,1.43,14.72,4.43,18a11.58,11.58,0,0,0,8.73,3.78c4.56,0,9-2.21,13.28-6.51l6.77,8.73C717,110.21,710.75,112.95,701.9,112.95Z" transform="translate(-6.9 -7.27)"/><path d="M735.21,112.7a9.67,9.67,0,1,1,9.62-9.67A9.63,9.63,0,0,1,735.21,112.7Zm0-17.42a7.78,7.78,0,1,0,7.44,7.75A7.55,7.55,0,0,0,735.21,95.27Zm1.9,13.11c-.42-.73-.6-1-1-1.8-1.07-1.95-1.4-2.5-1.79-2.65a.74.74,0,0,0-.34-.08v4.53h-2.13V97.54h4a3,3,0,0,1,3.2,3.17,2.78,2.78,0,0,1-2.42,3,2.49,2.49,0,0,1,.44.47c.62.78,2.6,4.21,2.6,4.21ZM736,99.44a4.35,4.35,0,0,0-1.22-.16H734v2.94h.73c.94,0,1.35-.11,1.64-.37a1.53,1.53,0,0,0,.42-1.09A1.28,1.28,0,0,0,736,99.44Z" transform="translate(-6.9 -7.27)"/><path class="cls-1" d="M168.72,55.82C161.07,20.67,118.92,0,74.56,9.64S.45,55.6,8.09,90.74s49.8,55.83,94.15,46.18S176.36,91,168.72,55.82ZM88.41,105.68a32.4,32.4,0,1,1,32.4-32.4A32.4,32.4,0,0,1,88.41,105.68Z" transform="translate(-6.9 -7.27)"/><path class="cls-2" d="M95.57,27.92A46.52,46.52,0,1,0,142.1,74.44,46.52,46.52,0,0,0,95.57,27.92Zm-7.17,73.66a28.3,28.3,0,1,1,28.3-28.3A28.3,28.3,0,0,1,88.41,101.58Z" transform="translate(-6.9 -7.27)"/></g></svg></li>
+          <li><img height="30px"src="media/opentracing-logo.png" style="border:0px"/></li>
+          <li><small>Prometheus (https://prometheus.io/)</small></li>
+          <li><small>... and others</small></li>
+        </ul>
+      </section>
+
+      <section data-background="media/monitoring.jpg"
+               style="color: black; text-align: left;">
+        <h2 style="color: black">Monitoring</h2>
+        <p>
+          Node.js core provides primitives<br />
+          to support monitoring...
+        </p>
+        <ul>
+          <li>async_hooks</li>
+          <li>perf_hooks</li>
+          <li>getActiveResources()</li>
+          <li>Trace Events</li>
+        </ul>
+      </section>
+
+      <section data-background="media/monitoring.jpg"
+               style="color: black; text-align: left;">
+        <section>
+          <h2 style="color: black">async_hooks</h2>
+          <p>Tracking asyncronous context...</p>
+  <pre>
+  const async_hooks = require('async_hooks');
+
+  const asyncHook = async_hooks.createHook({
+    init(asyncId, type, triggerAsyncId, resource) { },
+    before(asyncId) { },
+    after(asyncId) { },
+    destroy(asyncId) { },
+    promiseResolve(asyncId) { }
+  });
+
+  asyncHook.enable();
+  </pre>
+        </section>
+        <section>
+          <h2 style="color:black">async_hooks</h2>
+          <p>
+            A <b>handle</b> is a long-lived<br />
+            thing that can produce async activity<br />
+            over time.
+          </p>
+          <p>
+            A <b>request</b> is a short-lived<br />
+            request to do one asynchronous thing.
+          </p>
+        </section>
+        <section>
+            <h2 style="color:black">async_hooks</h2>
+            <p>
+              Examples of <b>handles</b> include<br />
+              socket connections, HTTP2 sessions,<br />
+              timers, and child processes.
+            </p>
+            <p>
+              Examples of <b>requests</b> include<br />
+              DNS queries, reading part of a file,<br />
+              spawning a child process.
+            </p>
+          </section>
+          <section>
+              <img src="media/eventloop.png" />
+            </section>
+          <section>
+            <h2 style="color:black">async_hooks</h2>
+            <p>
+              The async_hooks API will tell<br />
+              you when a resource or request is<br />
+              created and destroyed; and will<br />
+              tell you when the async resource<br />
+              <i>does</i> something. 
+            </p>
+            <p>
+              It is a low-level primitive that can<br />
+              be used to build more extensive<br />
+              monitoring.
+            </p>
+          </section>
+      </section>
+
+      <section data-background="media/monitoring.jpg"
+               style="color: black; text-align: left;">
+        <section>
+          <h2 style="color: black">getActiveResources()</h2>
+          <p>
+            This is a new public API being<br />
+            discussed right now to replace<br />
+            an unsupported internal API.
+          </p>
+          <p>
+            Where async_hooks gives you a<br />
+            view of resources and requests<br />
+            over time, getActiveResources()<br />
+            provides a view of <i>right now.</i>
+          </p>
+          <br /><br />
+        </section>
+      </section>
+
+      <section data-background="media/monitoring.jpg"
+               style="color: black; text-align: left;">
+        <section>
+          <h2 style="color: black">perf_hooks</h2>
+          <p>Ad hoc timing metrics</p>
+<pre>
+const { PerformanceObserver, performance } =
+  require('perf_hooks');
+
+const obs = new PerformanceObserver((items) => {
+  console.log(items.getEntries()[0].duration);
+});
+obs.observe({ entryTypes: ['measure'] });
+
+performance.mark('A');
+doSomeLongRunningProcess(() => {
+  performance.mark('B');
+  performance.measure('A to B', 'A', 'B');
+});
+</pre>
+        </section>
+        <section>
+            <h2 style="color: black">perf_hooks</h2>
+            <p>
+              This is the same basic<br />
+              Performance API provided by <br/>
+              browsers, with a few Node.js specific<br />
+              additions.
+            </p>
+            <ul>
+              <li>User timing marks</li>
+              <li>Node.js startup timing</li>
+              <li>Garbage collection timing</li>
+              <li>HTTP2 performance</li>
+            </ul>
+        </section>
+      </section>
+
+      <section data-background="media/monitoring.jpg"
+               style="color: black; text-align: left;">
+        <section>
+          <h2 style="color: black">Trace Events</h2>
+          <p>
+            Provide a record of what is happening<br />
+            within the Node.js process over<br />
+            time.
+          </p>
+          <p>
+            Recent changes in Node.js 10.x<br />
+            allows trace events to be<br />
+            enabled and monitored dynamically<br />
+            using the inspector protocol.
+          </p>
+        </section>
+        <section>
+          <h2 style="color: black">Trace Events</h2>
+<pre>
+const trace_events = require('trace_events');
+const categories = [
+  'node.perf',
+  'node.async_hooks'];
+const tracing =
+  trace_events.createTracing({ categories });
+tracing.enable();
+// do stuff
+tracing.disable();
+</pre>
+        </section>
+
+        <section>
+          <h2 style="color: black">Trace Events</h2>
+<pre>
+const CDP =
+  require('chrome-remote-interface');
+
+const client = await CDP({port: args.port});
+
+client.NodeTracing.tracingComplete(() => {
+  client.close();
+});
+
+client.on('event', (message) => { });
+
+await client.NodeTracing.start({
+  traceConfig: {
+    recordMode: 'recordContinuously',
+    includedCategories: ['node'],
+  }
+});
+
+setTimeout(() => {
+  client.NodeTracing.stop();
+}, 10000).unref();    
+</pre>
+        </section>
+      </section>
+
+      <section style="color: black; text-align: right">
+        <section data-background="media/profiling.jpg">
+          <h2 style="color: black">Profiling</h2>
+          <p>
+            Profiling involves collecting<br />
+            and analyzing performance and<br />
+            operation metrics for discreet<br />
+            parts of a Node.js app within<br />
+            a fixed period of time.
+          </p>
+        </section>
+        <section data-background="media/flamegraph.png"
+                 style="text-align:center">
+          <h2 style="color:black">0x Flamegraphs</h2>
+          <br /><br /><br /><br/ ><br /><br /><br />
+<pre style="color: black">
+$ npm i -g clinic
+$ clinic flame -- node some.application.js
+</pre>
+        </section>
+        <section data-background="media/profprocess.png">
+          <h2 style="color:white">--prof<br />--prof-process</h2>
+          <br /><br /><br /><br /><br /><br /><br /><br />
+        </section>
+        <section data-background="media/clinicdoctor.png">
+          <br /><br /><br /><br /><br /><br /><br />
+<pre style="color: white">
+$ npm i -g clinic
+$ clinic doctor -- node some.application.js
+</pre>
+        </section>
+        <section data-background="media/bubbleprof.png">
+        </section>
+        <section data-background="media/profiling.jpg">
+          <h2 style="color: black">Profiling</h2>
+          <p>
+            Profiling tools build on primitives<br />
+            like async_hooks, trace events,<br />
+            and --prof to build a snapshot of<br />
+            what your application is doing<br />
+            at a given point in time.
+          </p>
+        </section>
+      </section>
+
+      <section data-background="media/tracing.jpg"
+               style="color: black; text-align: left;">
+        <section>
+          <h2 style="color: black">Tracing</h2>
+          <p>
+            Tracing within Node.js is effectively<br />
+            a record of what is happening within<br />
+            the process.
+          </p>
+          <p>
+            There are some fantastic platform specific<br />
+            tracing utilities (e.g. dtrace)
+          </p>
+          <p>
+            Current efforts are focusing<br />
+            on the platform independent<br />
+            V8 Trace Events Format.
+          </p>
+        </section>
+        <section>
+          <h2 style="color: black">Tracing</h2>
+          <p>Demo...</p>
+        </section>
+        <section>
+          <h2 style="color: black">Tracing</h2>
+          <p>We are actively expanding the<br/>
+          information emitted as trace events.</p>
+          <ul>
+            <li>Process and Thread metadata</li>
+            <li>Async flow (using async_hooks)</li>
+            <li>Transaction detail (e.g. http requests, dns queries)</li>
+            <li>Sync operations</li>
+            <li>Timing details</li>
+          </ul>
+        </section>
+        <section>
+          <h2 style="color: black">Tracing</h2>
+          <p>More Demos...</p>
+        </section>
+      </section>
+
+      <section data-background="media/bugs.JPG">
+        <h2 style="color: black; text-align: left">Debugging</h2>
+        <br/> <br/><br/><br/><br/><br/>
+        <p style="text-align: right; color: black">
+          The Inspector Protocol is supported by Node.js
+          allowing tools like VS Code, Devtools, and others
+          to remotely debug and profile Node.js applications.
+        </p>
+      </section>
+
+      <section style="text-align: left;">
+        <h1>Thank you.</h1>
+        <p data-markdown>
+          - Twitter: [@jasnell](https://twitter.com/jasnell)
+          - GitHub: [@jasnell](https://github.com/jasnell)
+        </p>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="lib/js/head.min.js"></script>
+  <script src="js/reveal.js"></script>
+
+  <script>
+
+    // More info https://github.com/hakimel/reveal.js#configuration
+    Reveal.initialize({
+      controls: true,
+      progress: true,
+      history: true,
+      center: true,
+
+      transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+      // More info https://github.com/hakimel/reveal.js#dependencies
+      dependencies: [
+        { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+        { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+        { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+        { src: 'plugin/zoom-js/zoom.js', async: true },
+        { src: 'plugin/notes/notes.js', async: true }
+      ]
+    });
+  </script>
+</body>
+</html>
