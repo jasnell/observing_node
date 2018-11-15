@@ -18,15 +18,15 @@ new Promise((res) => {
   console.log('E')
 }).then(console.log);
 
-//queueMicrotask(() => console.log('D'));
+queueMicrotask(() => console.log('F'));
 
 (async (res) => {
   for (let n = 0; n < 1e6; n++) {}
-  process.nextTick(() => console.log('F'))
-  return 'G'
+  process.nextTick(() => console.log('G'))
+  return 'H'
 })().then(console.log)
 
-process.nextTick(() => console.log('H'))
+process.nextTick(() => console.log('I'))
 
 const promises = [];
 let n = 0;
@@ -35,6 +35,6 @@ for (; n < 10; n++)
 
 setTimeout((val) => ee.emit('foo', val), 1000, n)
 
-console.log('I')
+console.log('J')
 
 Promise.all(promises)

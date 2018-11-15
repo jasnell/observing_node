@@ -60,15 +60,15 @@ new Promise((res) => {
   console.log('E')
 }).then(console.log);
 
-//queueMicrotask(() => console.log('D'));
+queueMicrotask(() => console.log('F'));
 
 (async (res) => {
   for (let n = 0; n < 1e6; n++) {}
-  process.nextTick(() => console.log('F'))
-  return 'G'
+  process.nextTick(() => console.log('G'))
+  return 'H'
 })().then(console.log)
 
-process.nextTick(() => console.log('H'))
+process.nextTick(() => console.log('I'))
 
 const promises = [];
 let n = 0;
@@ -77,10 +77,13 @@ for (; n < 10; n++)
 
 setTimeout((val) => ee.emit('foo', val), 1000, n)
 
-console.log('I')
+console.log('J')
 
 Promise.all(promises)
 </code></pre>
+    <div>
+      https://github.com/jasnell/observing_node/blob/master/example/timing.js
+    </div>
   </div>
   <div>
     <ul>
@@ -95,7 +98,7 @@ Promise.all(promises)
     </ul>
   </div>
   <div>
-    JavaScript code<br />
+    JavaScript<br />
     <span class="supersplit">is not</span>
     <span class="bubblegum">asynchronous</span>.
   </div>
@@ -105,23 +108,100 @@ Promise.all(promises)
     asynchronous.
   </div>
   <div>
-    <span class="supersplit">Events</span> triggering
-    JavaScript code
+    <span class="supersplit">Events</span>
     <span class="bubblegum">are</span> asynchronous.
   </div>
   <div>
+    JavaScript<br />
+    <span class="supersplit">is not</span>
+    <span class="bubblegum">asynchronous</span>.
+  </div>
+  <div>
     When asynchronous things happen,
-    they are <span class="bubblegum">processed synchronously</span>.
+    the results are 
+    <span class="bubblegum">processed synchronously</span>.
   </div>
   <div>
     <img src="media/event-loop.png" width="100%" height="100%"/>
   </div>
   <div>
+    <img src="media/sorting.gif" width="100%" height="100%" />
+  </div>
+  <div>
+    The event loop can only execute one synchronous task at a time.
+  </div>
+  <div>
+    Whenever JavaScript is <span class="supersplit">running</span><br />
+    the Event Loop<br /><span class="bubblegum">is not</span>
+  </div>
+  <div>
+    Event Loop <span class="supersplit">Delay</span> :-(
+  </div>
+  <div>
     <span class="supersplit">Trick Question</span>:<br />
-    Does all JavaScript code in
+    Does all JavaScript in
     <span class="bubblegum">Node.js</span>
     run within the event loop?
   </div>
+  <div>
+    <span class="supersplit">Trick Question</span>:<br />
+    Does all JavaScript in
+    <span class="bubblegum">Node.js</span>
+    run within the <i><u>same</u></i> event loop?
+  </div>
+  <div>
+    Bootstrap &raquo;
+    Main &raquo;
+    EventLoop
+  </div>
+  <div>
+    Bootstrap is when Node.js
+    <span class="supersplit">loads it's own</span> JavaScript...
+  </div>
+  <div>
+    Main is when Node.js 
+    <span class="supersplit">initially</span> executes user code...
+  </div>
+  <div>
+    The Event Loop is only started
+    <span class="supersplit">after main scope</span> exits...
+  </div>
+  <div>
+    But <span class="supersplit">only</span> if asynchronous tasks
+    were scheduled...
+  </div>
+  <div>
+<pre><code>
+// hello.js
+for (let m = 0; m < 1e9; m++) {}
+
+$ node hello
+</code></pre>
+  </div>
+  <div>
+<pre><code>
+const { performance } = require('perf_hooks')
+
+// hello.js
+for (let m = 0; m < 1e9; m++) {}
+
+console.log(performance.nodeTiming.loopStart)  // -1
+</code></pre>
+  </div>
+  <div>
+<pre><code>
+const { performance } = require('perf_hooks')
+
+// hello.js
+for (let m = 0; m < 1e9; m++) {}
+
+setImmediate(() => console.log(performance.nodeTiming.loopStart))
+</code></pre>
+  </div>
+  <div>
+    Why is this <span class="supersplit">important</span>?
+  </div>
+
   <div>
 <pre><code>
 const EventEmitter = require('events')
@@ -144,15 +224,15 @@ new Promise((res) => {
   console.log('E')
 }).then(console.log);
 
-//queueMicrotask(() => console.log('D'));
+queueMicrotask(() => console.log('F'));
 
 (async (res) => {
   for (let n = 0; n < 1e6; n++) {}
-  process.nextTick(() => console.log('F'))
-  return 'G'
+  process.nextTick(() => console.log('G'))
+  return 'H'
 })().then(console.log)
 
-process.nextTick(() => console.log('H'))
+process.nextTick(() => console.log('I'))
 
 const promises = [];
 let n = 0;
@@ -161,13 +241,96 @@ for (; n < 10; n++)
 
 setTimeout((val) => ee.emit('foo', val), 1000, n)
 
-console.log('I')
+console.log('J')
 
 Promise.all(promises)
 </code></pre>
   </div>
   <div>
-    https://clinicjs.org
+    <span class="supersplit">First Rule</span>
+    of Node.js <span class="bubblegum">Performance</span>:<br />
+    Know what your event loop is doing
+  </div>
+  <div>
+    So <span class="supersplit">how</span> do we do that?
+  </div>
+  <div>
+      <span class="supersplit">Trace</span> Events
+  </div>
+  <div>
+    Async <span class="supersplit">Hooks</span>
+  </div>
+  <div>
+      <span class="supersplit">Bubble</span> Profiling
+  </div>
+
+  <div>
+<pre><code>chrome://tracing</code></pre>
+  </div>
+  <div>
+    <span class="bubblegum">Bootstrap</span> Trace Events
+  </div>
+  <div>
+<pre><code>
+$ node --trace-event-categories=v8,node.vm,node.bootstrap timing.js
+</code></pre>
+  </div>
+  <div>
+<pre><code>
+$ node --trace-event-categories=node.perf
+</code></pre>
+  </div>
+  <div>
+<pre><code>
+const { performance } = require('perf_hooks')
+
+const {
+  Worker, isMainThread, parentPort, workerData
+} = require('worker_threads')
+
+if (isMainThread) {
+  performance.mark('A')
+  const worker = new Worker(__filename)
+  worker.on('exit', () => {
+    performance.mark('B')
+    performance.measure('A to B', 'A', 'B')
+  })
+} else {
+  // This runs in a separate thread & event loop
+  setTimeout(() => {}, 2000);
+}
+</code></pre>
+  </div>
+  <div>
+    <span class="bubblegum">Async</span> Trace Events
+  </div>
+  <div>
+<pre><code>
+$ node --trace-event-categories=node.async_hooks timing.js
+</code></pre>
+  </div>
+  <div>
+    A Resource is a
+    <span class="supersplit">persistent object</span> that
+    generates events asynchronously over time.
+    (examples: Sockets, Promises)
+  </div>
+  <div>
+    A Request performs
+    <span class="supersplit">one task</span>
+    asynchronously once. (example: Reading a file)
+  </div>
+  <div>
+    The Trace Event Viewer is OK, but...
+  </div>
+  <div>
+    Clinic.js<br />
+    <div style="align:center">
+    <img src="media/doctor.png" style="width: 30%" />
+    <img src="media/flame.png" style="width: 30%" />
+    <img src="media/bubbleprof.png" style="width: 30%" />
+    </div>
+    <span style="font-size: 0.7em">https://clinicjs.org</span>
   </div>
   <div>
 <pre><code>
@@ -182,61 +345,117 @@ $ yarn global add clinic
 <pre><code>
 $ clinic bubble -- node timing.js
 </code></pre>
+https://bit.ly/2Fr2t4J
+  </div>
+  <div>
+    <span class="supersplit">Trick Question</span>: Are Promises Asynchronous?
+  </div>
+  <div>
+    <span class="supersplit">Trick Question</span>: Do Promises ever <i>execute</i> concurrently?
   </div>
   <div>
 <pre><code>
-$ ls {PID}.clinic-bubbleprof
+// Promise.all()
 
-  {PID}.clinic-bubbleprof-stacktrace
-  {PID}.clinic-bubbleprof-systeminfo
-  {PID}.clinic-bubbleprof-traceevent
+'use strict'
+
+async function foo() {
+  for (let m = 0; m < 1e9; m++) {}
+  return 'foo'
+}
+
+async function bar() {
+  for (let m = 0; m < 1e6; m++) {}
+  return 'bar'
+}
+
+async function all() {
+  return await Promise.all([foo(), bar()])
+}
+
+all().then(console.log)
 </code></pre>
-  </div>
-  <div>
-    Trace Events tell us what is happening
-    within the Node.js process.
-  </div>
-  <div>
-    <ul>
-      <li>Asynchronous context</li>
-      <li>Performance measures</li>
-      <li>V8 Compiling and Execution</li>
-      <li>Garbage Collection</li>
-      <li>Network Activity</li>
-    </ul>
-  </div>
-  <div>
-<pre><code>chrome://tracing</code></pre>
-  </div>
-  <div>
-    <span class="bubblegum">Question</span>:
-    Does all JavaScript code run within the EventLoop?
-  </div>
-  <div>
-    Node.js Bootstrap Events
   </div>
   <div>
 <pre><code>
-$ node --trace-event-categories=v8,node.vm,node.bootstrap
+// Promise.race()
+
+'use strict'
+
+async function foo() {
+  for (let m = 0; m < 1e9; m++) {}
+  return 'foo'
+}
+
+async function bar() {
+  for (let m = 0; m < 1e6; m++) {}
+  return 'bar'
+}
+
+async function race() {
+  return await Promise.race([foo(), bar()])
+}
+
+race().then(console.log)
 </code></pre>
-  </div>
-  <div>
-    Node.js Async Hooks
   </div>
   <div>
 <pre><code>
-$ node --trace-event-categories=node.async_hooks
+'use strict'
+
+const { promisify } = require('util')
+const timeout = promisify(setTimeout)
+
+async function foo() {
+  await timeout(10000)
+  return 'foo'
+}
+
+async function bar() {
+  await timeout(1000)
+  return 'bar'
+}
+
+async function race() {
+  return await Promise.race([foo(), bar()])
+}
+
+race().then(console.log)
 </code></pre>
   </div>
   <div>
-    In Node.js, a Resource is a
-    <span class="supersplit">persistent object</span> that
-    can generate events asynchronously over time.
+    Again... Why is this <span class="supersplit">important</span>?
   </div>
   <div>
-    A Request is a is a request to perform
-    <span class="supersplit">one task</span>
-    asynchronously once.
+<pre><code>
+'use strict'
+
+async function everythingIsFine() {
+  for (let m = 0; m < 1e9; m++) {}
+  return 'A'
+}
+
+async function doBadThings() {
+  const tasks = [];
+  for (let n = 0; n < 10; n++) {
+    tasks.push(everythingIsFine())
+  }
+  return await Promise.all(tasks)
+}
+
+doBadThings().then(() => console.log('done!'))
+</code></pre>
+  </div>
+  <div>
+<pre><code>
+$ clinic bubble -- node promises.js
+</code></pre>
+  </div>
+  <div>
+    The Microtask Queue & Next Tick Queue
+  </div>
+  <div>
+    <a href="https://upload.clinicjs.org/public/737b85fec41b8b45042f3b7411dcbf26a5164694efe0a7ef324197052459971a/32.clinic-bubbleprof.html">A real world example</a>
   </div>
 </body>
 </html>
