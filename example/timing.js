@@ -1,4 +1,3 @@
-
 const EventEmitter = require('events')
 
 async function a(val) { console.log('A', val) }
@@ -7,24 +6,27 @@ setImmediate(() => console.log('B'))
 
 const ee = new EventEmitter()
 ee.on('foo', async (val) => {
-  await a(val)
+  process.nextTick((val) => a(val), val++)
+  await a(val++)
+  a(val)
 })
 
 new Promise((res) => {
   for (let n = 0; n < 1e9; n++) {}
   setImmediate(() => console.log('C'))
-  res('D')
+  process.nextTick(() => res('D'))
+  console.log('E')
 }).then(console.log);
 
 //queueMicrotask(() => console.log('D'));
 
 (async (res) => {
   for (let n = 0; n < 1e6; n++) {}
-  process.nextTick(() => console.log('E'))
-  return 'F'
+  process.nextTick(() => console.log('F'))
+  return 'G'
 })().then(console.log)
 
-process.nextTick(() => console.log('G'))
+process.nextTick(() => console.log('H'))
 
 const promises = [];
 let n = 0;
@@ -33,6 +35,6 @@ for (; n < 10; n++)
 
 setTimeout((val) => ee.emit('foo', val), 1000, n)
 
-console.log('H')
+console.log('I')
 
 Promise.all(promises)
