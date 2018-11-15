@@ -3,18 +3,236 @@
 <head>
   <meta charset='utf-8'>
   <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0' />
-  <title>Big</title>
+  <title>Observing Node.js</title>
   <link href='big.css' rel='stylesheet' type='text/css' />
   <link href='highlight.css' rel='stylesheet' type='text/css' />
   <style>
     .new-shiny { background: #aaaaaa; }
+    .new-bubblegum { background: #F6BAB8; }
+    .new-brunchPink { background: #FB7A9C; }
+    .new-supersplit { background: #FB775E; }
+    .mystery-box {
+      background: url('./media/mystery-box.jpg');
+      background-size: 100%;
+      width: 110%;
+      height: 100%;
+    }
+    .event-loop {
+      background: url('./media/event-loop.png');
+      background-size: 100%;
+      width: 110%;
+      height: 100%;
+    }
   </style>
   <script src='big.js'></script>
   <script src='highlight.js'></script>
   <script>hljs.initHighlightingOnLoad();</script>
 </head>
 <body class='dark'>
-  <div>Your presentation goes here</div>
+  <div>
+    <span class="supersplit">Observing</span> Node.js <br />
+    <span class="brunchPink" style="font-size: 0.4em">@jasnell</span>
+  </div>
   <div class='logo'></div>
+  <div class="mystery-box"></div>
+  <div>
+    What's <span class="supersplit">inside</span> the box?
+  </div>
+  <div>
+<pre><code>
+'use strict';
+
+const EventEmitter = require('events')
+
+async function a(val) { console.log('A', val) }
+
+setImmediate(() => console.log('B'))
+
+const ee = new EventEmitter()
+ee.on('foo', async (val) => {
+  await a(val)
+})
+
+new Promise((res) => {
+  for (let n = 0; n < 1e9; n++) {}
+  res('C')
+}).then(console.log)
+
+queueMicrotask(() => console.log('D'));
+
+(async (res) => {
+  for (let n = 0; n < 1e6; n++) {}
+  process.nextTick(() => console.log('E'))
+  return 'F'
+})().then(console.log)
+
+process.nextTick(() => console.log('G'))
+
+const promises = [];
+let n = 0;
+for (; n < 10; n++)
+  promises.push(a(n))
+
+setTimeout((val) => ee.emit('foo', val), 1000, n)
+
+console.log('H')
+
+Promise.all(promises)
+</code></pre>
+  </div>
+  <div>
+    <ul>
+      <li><code>Promise</code></li>
+      <li><code>EventEmitter</code></li>
+      <li><code>async/await</code></li>
+      <li><code>process.nextTick()</code></li>
+      <li><code>setImmediate()</code></li>
+      <li><code>setTimeout()</code></li>
+      <li><code>setInterval()</code></li>
+      <li><code>queueMicrotask()</code></li>
+    </ul>
+  </div>
+  <div>
+    JavaScript code<br />
+    <span class="supersplit">is not</span>
+    <span class="bubblegum">asynchronous</span>.
+  </div>
+  <div>
+    <span class="supersplit">File</span> and
+    <span class="bubblegum">Network</span> i/o is
+    asynchronous.
+  </div>
+  <div>
+    <span class="supersplit">Events</span> triggering
+    JavaScript code
+    <span class="bubblegum">are</span> asynchronous.
+  </div>
+  <div>
+    When asynchronous things happen,
+    they are <span class="bubblegum">processed synchronously</span>.
+  </div>
+  <div>
+    <img src="media/event-loop.png" width="100%" height="100%"/>
+  </div>
+  <div>
+    <span class="supersplit">Trick Question</span>:<br />
+    Does all JavaScript code in
+    <span class="bubblegum">Node.js</span>
+    run within the event loop?
+  </div>
+  <div>
+<pre><code>
+'use strict';
+
+const EventEmitter = require('events')
+
+async function a(val) { console.log('A', val) }
+
+setImmediate(() => console.log('B'))
+
+const ee = new EventEmitter()
+ee.on('foo', async (val) => {
+  await a(val)
+})
+
+new Promise((res) => {
+  for (let n = 0; n < 1e9; n++) {}
+  res('C')
+}).then(console.log)
+
+queueMicrotask(() => console.log('D'));
+
+(async (res) => {
+  for (let n = 0; n < 1e6; n++) {}
+  process.nextTick(() => console.log('E'))
+  return 'F'
+})().then(console.log)
+
+process.nextTick(() => console.log('G'))
+
+const promises = [];
+let n = 0;
+for (; n < 10; n++)
+  promises.push(a(n))
+
+setTimeout((val) => ee.emit('foo', val), 1000, n)
+
+console.log('H')
+
+Promise.all(promises)
+</code></pre>
+  </div>
+  <div>
+    https://clinicjs.org
+  </div>
+  <div>
+<pre><code>
+$ npm i -g clinic
+
+// or
+
+$ yarn global add clinic
+</code></pre>
+  </div>
+  <div>
+<pre><code>
+$ clinic bubble -- node timing.js
+</code></pre>
+  </div>
+  <div>
+<pre><code>
+$ ls {PID}.clinic-bubbleprof
+
+  {PID}.clinic-bubbleprof-stacktrace
+  {PID}.clinic-bubbleprof-systeminfo
+  {PID}.clinic-bubbleprof-traceevent
+</code></pre>
+  </div>
+  <div>
+    Trace Events tell us what is happening
+    within the Node.js process.
+  </div>
+  <div>
+    <ul>
+      <li>Asynchronous context</li>
+      <li>Performance measures</li>
+      <li>V8 Compiling and Execution</li>
+      <li>Garbage Collection</li>
+      <li>Network Activity</li>
+    </ul>
+  </div>
+  <div>
+<pre><code>chrome://tracing</code></pre>
+  </div>
+  <div>
+    <span class="bubblegum">Question</span>:
+    Does all JavaScript code run within the EventLoop?
+  </div>
+  <div>
+    Node.js Bootstrap Events
+  </div>
+  <div>
+<pre><code>
+$ node --trace-event-categories=v8,node.vm,node.bootstrap
+</code></pre>
+  </div>
+  <div>
+    Node.js Async Hooks
+  </div>
+  <div>
+<pre><code>
+$ node --trace-event-categories=node.async_hooks
+</code></pre>
+  </div>
+  <div>
+    In Node.js, a Resource is a
+    <span class="supersplit">persistent object</span> that
+    can generate events asynchronously over time.
+  </div>
+  <div>
+    A Request is a is a request to perform
+    <span class="supersplit">one task</span>
+    asynchronously once.
+  </div>
 </body>
 </html>
