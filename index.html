@@ -11,12 +11,6 @@
     .new-bubblegum { background: #F6BAB8; }
     .new-brunchPink { background: #FB7A9C; }
     .new-supersplit { background: #FB775E; }
-    .mystery-box {
-      background: url('./media/mystery-box.jpg');
-      background-size: 100%;
-      width: 110%;
-      height: 100%;
-    }
     .event-loop {
       background: url('./media/event-loop.png');
       background-size: 100%;
@@ -34,9 +28,9 @@
     <span class="brunchPink" style="font-size: 0.4em">@jasnell</span>
   </div>
   <div class='logo'></div>
-  <div class="mystery-box"></div>
+  <div data-background-image="./media/useless.gif"></div>
   <div>
-    What's <span class="supersplit">inside</span> the box?
+    What's <span class="supersplit">happening</span> inside?
   </div>
   <div>
 <pre><code>
@@ -81,9 +75,6 @@ console.log('J')
 
 Promise.all(promises)
 </code></pre>
-    <div>
-      https://github.com/jasnell/observing_node/blob/master/example/timing.js
-    </div>
   </div>
   <div>
     <ul>
@@ -93,78 +84,147 @@ Promise.all(promises)
       <li><code>process.nextTick()</code></li>
       <li><code>setImmediate()</code></li>
       <li><code>setTimeout()</code></li>
-      <li><code>setInterval()</code></li>
       <li><code>queueMicrotask()</code></li>
     </ul>
   </div>
   <div>
-    JavaScript<br />
-    <span class="supersplit">is not</span>
-    <span class="bubblegum">asynchronous</span>.
+    <span class="supersplit">Your Challenge</span>:
+    In what order the statements will be printed?
+  </div>
+  <div>https://bit.ly/2PwFedP</div>
+  <div>
+<pre><code>
+const EventEmitter = require('events')
+
+async function a(val) { console.log('A', val) }
+
+setImmediate(() => console.log('B'))
+
+const ee = new EventEmitter()
+ee.on('foo', async (val) => {
+  process.nextTick((val) => a(val), val++)
+  await a(val++)
+  a(val)
+})
+
+new Promise((res) => {
+  for (let n = 0; n < 1e9; n++) {}
+  setImmediate(() => console.log('C'))
+  process.nextTick(() => res('D'))
+  console.log('E')
+}).then(console.log);
+
+queueMicrotask(() => console.log('F'));
+
+(async (res) => {
+  for (let n = 0; n < 1e6; n++) {}
+  process.nextTick(() => console.log('G'))
+  return 'H'
+})().then(console.log)
+
+process.nextTick(() => console.log('I'))
+
+const promises = [];
+let n = 0;
+for (; n < 10; n++)
+  promises.push(a(n))
+
+setTimeout((val) => ee.emit('foo', val), 1000, n)
+
+console.log('J')
+
+Promise.all(promises)
+</code></pre>
   </div>
   <div>
-    <span class="supersplit">File</span> and
-    <span class="bubblegum">Network</span> i/o is
-    asynchronous.
+    <span class="bubblegum">Four</span>
+    <span class="brunchPink">Critical</span>
+    <span class="supersplit">Concepts</span>
   </div>
   <div>
-    <span class="supersplit">Events</span>
-    <span class="bubblegum">are</span> asynchronous.
+    <span class="bubblegum">The Event Loop</span>
   </div>
   <div>
-    JavaScript<br />
-    <span class="supersplit">is not</span>
-    <span class="bubblegum">asynchronous</span>.
+    <span class="brunchPink">The Next Tick Queue</span>
   </div>
   <div>
-    When asynchronous things happen,
-    the results are 
-    <span class="bubblegum">processed synchronously</span>.
+    <span class="supersplit">The Microtask Queue</span>
   </div>
+  <div>
+    <span class="bubblegum">JavaScript</span>
+    <span class="brunchPink">is not</span>
+    <span class="supersplit">asynchronous</span>.
+  </div>
+
+
   <div>
     <img src="media/event-loop.png" width="100%" height="100%"/>
   </div>
+  <div data-background-image="./media/sorting.gif"></div>
+
   <div>
-    <img src="media/sorting.gif" width="100%" height="100%" />
+    The <span class="bubblegum">event loop</span>
+    <span class="brunchPink">executes</span> only
+    <span class="supersplit">one task</span> at a time.
   </div>
   <div>
-    The event loop can only execute one synchronous task at a time.
+    When <span class="bubblegum">JavaScript</span> is
+    <span class="brunchPink">running</span>
+    the Event Loop <span class="supersplit">is not</span>
   </div>
   <div>
-    Whenever JavaScript is <span class="supersplit">running</span><br />
-    the Event Loop<br /><span class="bubblegum">is not</span>
+    <span class="bubblegum">Event</span>
+    <span class="brunchPink">Loop</span>
+    <span class="supersplit">Delay</span>
   </div>
   <div>
-    Event Loop <span class="supersplit">Delay</span> :-(
+<pre><code>
+const eventEmitter = new EventEmitter()
+
+eventEmitter.on('some-event', () => {
+  for (let m = 0; m < 1e20; m++) {
+    // Block everything
+  }
+})
+</code></pre>
   </div>
   <div>
-    <span class="supersplit">Trick Question</span>:<br />
+    <span class="bubblegum">JavaScript</span>
+    <span class="brunchPink">is not</span>
+    <span class="supersplit">asynchronous</span>.
+  </div>
+
+  <div>
+    <span class="bubblegum">Trick Question</span>:<br />
     Does all JavaScript in
-    <span class="bubblegum">Node.js</span>
-    run within the event loop?
+    <span class="brunchPink">Node.js</span>
+    run within the <span class="supersplit">event loop</span>?
   </div>
   <div>
-    <span class="supersplit">Trick Question</span>:<br />
-    Does all JavaScript in
-    <span class="bubblegum">Node.js</span>
-    run within the <i><u>same</u></i> event loop?
+      <span class="bubblegum">Trick Question</span>:<br />
+      Does all JavaScript in
+      <span class="brunchPink">Node.js</span>
+      run within the <i><u>same</u></i>
+      <span class="supersplit">event loop</span>?
+    </div>
+
+    <div>
+    <span class="bubblegum">Bootstrap</span> &raquo;
+    <span class="brunchPink">Main</span> &raquo;
+    <span class="supersplit">Event Loop</span>
+  </div>
+
+  <div>
+    <span class="supersplit">Bootstrap</span>:
+    Node.js loads it's own JavaScript...
   </div>
   <div>
-    Bootstrap &raquo;
-    Main &raquo;
-    EventLoop
+    <span class="supersplit">Main</span>:
+    Node.js loads and executes user code...
   </div>
   <div>
-    Bootstrap is when Node.js
-    <span class="supersplit">loads it's own</span> JavaScript...
-  </div>
-  <div>
-    Main is when Node.js 
-    <span class="supersplit">initially</span> executes user code...
-  </div>
-  <div>
-    The Event Loop is only started
-    <span class="supersplit">after main scope</span> exits...
+    <span class="supersplit">Event Loop</span>:
+    Started after main scope exits...
   </div>
   <div>
     But <span class="supersplit">only</span> if asynchronous tasks
@@ -172,32 +232,20 @@ Promise.all(promises)
   </div>
   <div>
 <pre><code>
-// hello.js
-for (let m = 0; m < 1e9; m++) {}
+// bootstrap.js
 
-$ node hello
-</code></pre>
-  </div>
-  <div>
-<pre><code>
 const { performance } = require('perf_hooks')
 
-// hello.js
-for (let m = 0; m < 1e9; m++) {}
+console.log(performance.nodeTiming.loopStart)  //  === -1
 
-console.log(performance.nodeTiming.loopStart)  // -1
+setImmediate(() =>{
+  console.log(performance.nodeTiming.loopStart)  //  !== -1
+})
+
+$ node bootstrap.js
 </code></pre>
   </div>
-  <div>
-<pre><code>
-const { performance } = require('perf_hooks')
 
-// hello.js
-for (let m = 0; m < 1e9; m++) {}
-
-setImmediate(() => console.log(performance.nodeTiming.loopStart))
-</code></pre>
-  </div>
   <div>
     Why is this <span class="supersplit">important</span>?
   </div>
@@ -246,29 +294,39 @@ console.log('J')
 Promise.all(promises)
 </code></pre>
   </div>
+
   <div>
-    <span class="supersplit">First Rule</span>
-    of Node.js <span class="bubblegum">Performance</span>:<br />
-    Know what your event loop is doing
+    The <span class="bubblegum">Next Tick</span> and
+    <span class="brunchPink">Microtask</span>
+    <span class="supersplit">Queues</span>
+  </div>
+
+  <div>
+    <span class="bubblegum">First Rule of Node.js</span>
+    <span class="brunchPink">Performance</span>:<br />
+    <span class="supersplit">Know when your code is running</span>
+  </div>
+
+  <div>
+      <span class="bubblegum">Trace</span>
+      <span class="supersplit">Events</span>
   </div>
   <div>
-    So <span class="supersplit">how</span> do we do that?
+      <span class="bubblegum">Async</span>
+      <span class="supersplit">Hooks</span>
   </div>
   <div>
-      <span class="supersplit">Trace</span> Events
-  </div>
-  <div>
-    Async <span class="supersplit">Hooks</span>
-  </div>
-  <div>
-      <span class="supersplit">Bubble</span> Profiling
+      <span class="bubblegum">Bubble</span>
+      <span class="supersplit">Profiling</span>
   </div>
 
   <div>
 <pre><code>chrome://tracing</code></pre>
   </div>
   <div>
-    <span class="bubblegum">Bootstrap</span> Trace Events
+    <span class="bubblegum">Bootstrap</span>
+    <span class="brunchPink">Trace</span>
+    <span class="supersplit">Events</span>
   </div>
   <div>
 <pre><code>
@@ -276,53 +334,16 @@ $ node --trace-event-categories=v8,node.vm,node.bootstrap timing.js
 </code></pre>
   </div>
   <div>
-<pre><code>
-$ node --trace-event-categories=node.perf
-</code></pre>
-  </div>
-  <div>
-<pre><code>
-const { performance } = require('perf_hooks')
-
-const {
-  Worker, isMainThread, parentPort, workerData
-} = require('worker_threads')
-
-if (isMainThread) {
-  performance.mark('A')
-  const worker = new Worker(__filename)
-  worker.on('exit', () => {
-    performance.mark('B')
-    performance.measure('A to B', 'A', 'B')
-  })
-} else {
-  // This runs in a separate thread & event loop
-  setTimeout(() => {}, 2000);
-}
-</code></pre>
-  </div>
-  <div>
-    <span class="bubblegum">Async</span> Trace Events
+      <span class="bubblegum">Async</span>
+      <span class="brunchPink">Trace</span>
+      <span class="supersplit">Events</span>
   </div>
   <div>
 <pre><code>
 $ node --trace-event-categories=node.async_hooks timing.js
 </code></pre>
   </div>
-  <div>
-    A Resource is a
-    <span class="supersplit">persistent object</span> that
-    generates events asynchronously over time.
-    (examples: Sockets, Promises)
-  </div>
-  <div>
-    A Request performs
-    <span class="supersplit">one task</span>
-    asynchronously once. (example: Reading a file)
-  </div>
-  <div>
-    The Trace Event Viewer is OK, but...
-  </div>
+
   <div>
     Clinic.js<br />
     <div style="align:center">
@@ -348,10 +369,14 @@ $ clinic bubble -- node timing.js
 https://bit.ly/2Fr2t4J
   </div>
   <div>
-    <span class="supersplit">Trick Question</span>: Are Promises Asynchronous?
+    <span class="bubblegum">Trick Question</span>:
+    <span class="brunchPink">Are Promises</span>
+    <span class="supersplit">Asynchronous</span>?
   </div>
   <div>
-    <span class="supersplit">Trick Question</span>: Do Promises ever <i>execute</i> concurrently?
+      <span class="bubblegum">Trick Question</span>:
+      <span class="brunchPink">Do Promises</span>
+      <span class="supersplit">execute asynchronously</span>?
   </div>
   <div>
 <pre><code>
@@ -423,9 +448,11 @@ async function race() {
 race().then(console.log)
 </code></pre>
   </div>
+
   <div>
-    Again... Why is this <span class="supersplit">important</span>?
+    Why is this <span class="supersplit">important</span>?
   </div>
+
   <div>
 <pre><code>
 'use strict'
@@ -455,7 +482,16 @@ $ clinic bubble -- node promises.js
     The Microtask Queue & Next Tick Queue
   </div>
   <div>
-    <a href="https://upload.clinicjs.org/public/737b85fec41b8b45042f3b7411dcbf26a5164694efe0a7ef324197052459971a/32.clinic-bubbleprof.html">A real world example</a>
+    A real world example:
+    <ul>
+      <li>Poor response times</li>
+      <li>Thousands of Promises Created</li>
+      <li>JSON.parse/JSON.serialize</li>
+      <li>Tight synchronous loops</li>
+      <li>Synchronous Promises</li>
+      <li>Expensive Logging</li>
+    </ul>
+    <a href="https://bit.ly/2Fr2t4J">https://bit.ly/2Fr2t4J</a>
   </div>
 </body>
 </html>
